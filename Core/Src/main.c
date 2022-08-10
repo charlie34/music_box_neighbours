@@ -55,6 +55,11 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_RTC_Init(void);
+typedef struct timetable{
+	uint8_t hora;
+	uint8_t minuto;
+	uint8_t pista;
+}timetable;
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -73,7 +78,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-
+    timetable time_prog[5]={{23,50,1},{23,52,2},{23,53,3},{23,54,4},{23,55,5}};
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -101,7 +106,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint8_t buffer[100];
+  uint8_t buffer[30];
  uint8_t buf;
   HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
   initialization(huart1);
@@ -111,14 +116,18 @@ int main(void)
   GetTime.Hours=24;
   GetTime.Minutes=50;
  //mp3_play_num(4);
-  mp3_play_physical_num(1);
+ // mp3_play_physical_num(1);
   HAL_RTC_SetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
   while (1)
   {
 	  HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);//Get time
 	      /* Get the RTC current Date */
 	      HAL_RTC_GetDate(&hrtc, &GetData, RTC_FORMAT_BIN);//get date
-
+          for (int i=0;i<5;i++){
+        	  if((time_prog[i].hora==GetTime.Hours) && (time_prog[i].minuto==GetTime.Minutes)&&(GetTime.Seconds==0)){
+        		  mp3_play_physical_num(time_prog[i].pista);
+        	  }
+          }
 	      /* Display date Format : yy/mm/dd */
 	      sprintf(buffer,"%02d/%02d/%02d\r\n",2000 + GetData.Year, GetData.Month, GetData.Date);
 	      /* Display time Format : hh:mm:ss */
