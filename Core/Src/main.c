@@ -27,7 +27,12 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef struct temporizacion{
+	uint8_t hora;
+	uint8_t minuto;
+	uint8_t segundo;
+	uint8_t pista;
+}temporizacion;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -55,11 +60,6 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_RTC_Init(void);
-typedef struct timetable{
-	uint8_t hora;
-	uint8_t minuto;
-	uint8_t pista;
-}timetable;
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -78,7 +78,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-    timetable time_prog[5]={{23,50,1},{23,52,2},{23,53,3},{23,54,4},{23,55,5}};
+
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -101,15 +101,15 @@ int main(void)
   MX_USART1_UART_Init();
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
-
+  temporizacion time_prog[5]={{23,50,00,1},{23,52,00,1},{23,53,00,1},{23,54,00,1},{23,55,00,1}};
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint8_t buffer[30];
  uint8_t buf;
-  HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
-  initialization(huart1);
+ // HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
+ initialization(huart1);
   RTC_DateTypeDef GetData;  //Get date structure
 
   RTC_TimeTypeDef GetTime;   //Get time structure
@@ -118,6 +118,7 @@ int main(void)
  //mp3_play_num(4);
  // mp3_play_physical_num(1);
   HAL_RTC_SetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+  init(huart2);
   while (1)
   {
 	  HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);//Get time
@@ -128,12 +129,17 @@ int main(void)
         		  mp3_play_physical_num(time_prog[i].pista);
         	  }
           }
+          put_hora(20);
+          put_minuto(30);
+          put_command(1);
+          put_data(2393);
+          send_frame_complete();
 	      /* Display date Format : yy/mm/dd */
-	      sprintf(buffer,"%02d/%02d/%02d\r\n",2000 + GetData.Year, GetData.Month, GetData.Date);
+	    //  sprintf(buffer,"%02d/%02d/%02d\r\n",2000 + GetData.Year, GetData.Month, GetData.Date);
 	      /* Display time Format : hh:mm:ss */
-	      HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
-	      sprintf(buffer,"%02d:%02d:%02d\r\n",GetTime.Hours, GetTime.Minutes, GetTime.Seconds);
-	      HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
+	     // HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
+	    //  sprintf(buffer,"%02d:%02d:%02d\r\n",GetTime.Hours, GetTime.Minutes, GetTime.Seconds);
+	     // HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
 	      //printf("\r\n");
 
 	      HAL_Delay(1000);

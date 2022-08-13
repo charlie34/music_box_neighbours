@@ -7,6 +7,7 @@
 #include "DFPlayer.h"
 #include "stdio.h"
 #include "main.h"
+#include "string.h"
 void initialization(UART_HandleTypeDef huart)
 {
     uint8_t tmp[10] = {0x7E, 0xFF, 06, 00, 00, 00, 00, 00, 00, 0xEF};

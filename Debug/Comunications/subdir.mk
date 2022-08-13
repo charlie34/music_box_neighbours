@@ -4,17 +4,20 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../DFPlayer/DFPlayer.c 
+../Comunications/frame_coder.c \
+../Comunications/frame_decoder.c 
 
 OBJS += \
-./DFPlayer/DFPlayer.o 
+./Comunications/frame_coder.o \
+./Comunications/frame_decoder.o 
 
 C_DEPS += \
-./DFPlayer/DFPlayer.d 
+./Comunications/frame_coder.d \
+./Comunications/frame_decoder.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-DFPlayer/%.o: ../DFPlayer/%.c
+Comunications/%.o: ../Comunications/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU GCC Compiler'
 	@echo $(PWD)
