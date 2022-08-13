@@ -49,8 +49,12 @@ RTC_HandleTypeDef hrtc;
 
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
-
+//uint8_t c;
 /* USER CODE BEGIN PV */
+uint8_t c;  //  creating a buffer of 10 bytes
+
+
+
 
 /* USER CODE END PV */
 
@@ -60,6 +64,8 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_RTC_Init(void);
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+void USART2_IRQHandler(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -103,13 +109,14 @@ int main(void)
   /* USER CODE BEGIN 2 */
   temporizacion time_prog[5]={{23,50,00,1},{23,52,00,1},{23,53,00,1},{23,54,00,1},{23,55,00,1}};
   /* USER CODE END 2 */
-
+  HAL_UART_Receive_IT(&huart2, &c, 1);
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint8_t buffer[30];
  uint8_t buf;
+
  // HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
- initialization(huart1);
+// initialization(huart1);
   RTC_DateTypeDef GetData;  //Get date structure
 
   RTC_TimeTypeDef GetTime;   //Get time structure
@@ -118,7 +125,8 @@ int main(void)
  //mp3_play_num(4);
  // mp3_play_physical_num(1);
   HAL_RTC_SetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
-  init(huart2);
+  HAL_UART_Receive_IT(&huart2, c, 1);
+ // init(huart2);
   while (1)
   {
 	  HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);//Get time
@@ -135,7 +143,7 @@ int main(void)
           put_data(2393);
           send_frame_complete();
 	      /* Display date Format : yy/mm/dd */
-	    //  sprintf(buffer,"%02d/%02d/%02d\r\n",2000 + GetData.Year, GetData.Month, GetData.Date);
+	     sprintf(buffer,"%02d/%02d/%02d\r\n",2000 + GetData.Year, GetData.Month, GetData.Date);
 	      /* Display time Format : hh:mm:ss */
 	     // HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
 	    //  sprintf(buffer,"%02d:%02d:%02d\r\n",GetTime.Hours, GetTime.Minutes, GetTime.Seconds);
@@ -154,6 +162,23 @@ int main(void)
   * @brief System Clock Configuration
   * @retval None
   */
+void USART2_IRQHandler(void)
+{
+  HAL_UART_IRQHandler(&huart2);
+}
+
+/* This callback is called by the HAL_UART_IRQHandler when the given number of bytes are received */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart->Instance == USART2)
+  {
+    /* Transmit one byte with 100 ms timeout */
+    HAL_UART_Transmit(&huart2, &c, 1, 100);
+
+    /* Receive one byte in interrupt mode */
+    HAL_UART_Receive_IT(&huart2, &c, 1);
+  }
+}
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};

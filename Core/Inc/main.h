@@ -37,7 +37,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+uint8_t c;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/

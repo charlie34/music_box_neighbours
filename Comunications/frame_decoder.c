@@ -9,11 +9,13 @@
 void decoder(uint8_t symbol){
 	 static uint8_t state_machine=0;
 	 static uint8_t data_byte_pos=0;
+	// char buffer[20];
 	 uint8_t data_tmp[2];
 	 switch(symbol){
 	 case 0x48:{
 		 if (state_machine==0){
 			 state_machine=1;
+			 //HAL_UART_Transmit(&huart1, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
 		 }
 		 break;
 	 }

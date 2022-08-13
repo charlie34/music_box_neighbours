@@ -9,12 +9,12 @@
 #define FRAME_DECODER_H_
 uint8_t checksum_tmp;
 uint8_t buffer_tmp[14];
-uint8_t hora=0;
-uint8_t minuto=0;
-uint8_t segundo=0;
-uint8_t track=0;
-uint8_t cmd=0;
-uint16_t *data_dec=0;
+ uint8_t hora;
+uint8_t minuto;
+uint8_t segundo;
+uint8_t track;
+uint8_t cmd;
+uint16_t *data_dec;
 uint16_t data;
 void decoder(uint8_t symbol);
 uint8_t checksum_calc(uint8_t *payload);
