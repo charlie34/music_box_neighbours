@@ -16,7 +16,7 @@ uint8_t track;
 uint8_t cmd;
 uint16_t *data_dec;
 uint16_t data;
-void decoder(uint8_t symbol);
+void decoder(uint8_t *buffer_uart);
 uint8_t checksum_calc(uint8_t *payload);
 uint8_t error_frame();
 uint8_t horas();

@@ -19,7 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "frame_decoder.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -51,7 +51,7 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 //uint8_t c;
 /* USER CODE BEGIN PV */
-uint8_t c;  //  creating a buffer of 10 bytes
+uint8_t buffer_uart[14];  //  creating a buffer of 10 bytes
 
 
 
@@ -109,7 +109,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   temporizacion time_prog[5]={{23,50,00,1},{23,52,00,1},{23,53,00,1},{23,54,00,1},{23,55,00,1}};
   /* USER CODE END 2 */
-  HAL_UART_Receive_IT(&huart2, &c, 1);
+ // HAL_UART_Receive_IT(&huart2, &c, 1);
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint8_t buffer[30];
@@ -125,7 +125,7 @@ int main(void)
  //mp3_play_num(4);
  // mp3_play_physical_num(1);
   HAL_RTC_SetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
-  HAL_UART_Receive_IT(&huart2, c, 1);
+  HAL_UART_Receive_IT(&huart2, buffer_uart, 13);
  // init(huart2);
   while (1)
   {
@@ -173,10 +173,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   if (huart->Instance == USART2)
   {
     /* Transmit one byte with 100 ms timeout */
-    HAL_UART_Transmit(&huart2, &c, 1, 100);
+    decoder(buffer_uart);
+	//HAL_UART_Transmit(&huart2, &c, 1, 100);
 
     /* Receive one byte in interrupt mode */
-    HAL_UART_Receive_IT(&huart2, &c, 1);
+    HAL_UART_Receive_IT(&huart2, buffer_uart, 13);
   }
 }
 void SystemClock_Config(void)

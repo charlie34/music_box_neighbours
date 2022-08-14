@@ -6,99 +6,24 @@
  */
 #include "frame_decoder.h"
 #include "main.h"
-void decoder(uint8_t symbol){
+void decoder(uint8_t *buffer_uart){
 	 static uint8_t state_machine=0;
 	 static uint8_t data_byte_pos=0;
-	// char buffer[20];
-	 uint8_t data_tmp[2];
-	 switch(symbol){
-	 case 0x48:{
-		 if (state_machine==0){
-			 state_machine=1;
-			 //HAL_UART_Transmit(&huart1, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
-		 }
-		 break;
-	 }
-	 case 0x45:{
-		 if (state_machine==1){
-					 state_machine=2;
-				 }
-				 break;
-	 }
-	 case 0x4C:{
-		 if (state_machine==2){
-							 state_machine=3;
-						 }
-						 break;
-	 }
 
-	 case 0x4F:{
-	 		 if (state_machine==3){
-	 							 state_machine=4;
-	 						 }
-	 						 break;
-	 	 }
-	 default:{
-		 state_machine=0;
-	 }
-	 }
-	 if (state_machine==4){
-		 switch(data_byte_pos){
-		 case 0:{
-			 hora=symbol;
-			 buffer_tmp[data_byte_pos]=symbol;
-			 data_byte_pos++;
-			 break;
-		 }
+	 // char buffer[20];
+	  char header[4]={'H','E','L','O'};
+	  for(int i=0;i<4;i++){
+		  if (header[i]==*(buffer_uart+i)){
+			  state_machine++;
+		  }
+	  }
+    if (state_machine==4){
+    	for (int j=4;j<13;j++){
+    		buffer_tmp[j-4]=*(buffer_uart+j);
+    	}
+    	state_machine=0;
+    }
 
-		 case 1:{
-		 			 minuto=symbol;
-		 			 buffer_tmp[data_byte_pos]=symbol;
-		 			 data_byte_pos++;
-		 			 break;
-		 		 }
-		 case 2:{
-		 			 segundo=symbol;
-		 			 buffer_tmp[data_byte_pos]=symbol;
-		 			 data_byte_pos++;
-		 			 break;
-		 		 }
-		 case 3:{
-				 			 track=symbol;
-				 			 buffer_tmp[data_byte_pos]=symbol;
-				 			 data_byte_pos++;
-				 			 break;
-				 		 }
-		 case 4:{
-			                 cmd=symbol;
-			                 buffer_tmp[data_byte_pos]=symbol;
-				 			 data_byte_pos++;
-				 			 break;
-				 		 }
-		 case 5:{
-			 buffer_tmp[data_byte_pos]=symbol;
-			 data_tmp[0]=symbol;
-			 data_byte_pos++;
-			 break;
-		 }
-		 case 6:{
-			 data_tmp[1]=symbol;
-			 buffer_tmp[data_byte_pos]=symbol;
-					 data_byte_pos++;
-					 break;
-				 }
-		 case 7:{
-			 checksum_tmp=symbol;
-			 buffer_tmp[data_byte_pos]=symbol;
-			 data_byte_pos=0;
-			 state_machine=0;
-			 break;
-		 }
-		 }
-
-	 }
-	 data_dec=(uint16_t*)data_tmp;
-	 data=*data_dec;
 }
 uint8_t checksum_calc(uint8_t *payload){
     uint8_t tmp=0;
