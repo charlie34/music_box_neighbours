@@ -19,6 +19,4 @@ void put_command(uint8_t cmd);
 void put_data(uint16_t data);
 void send_frame(uint8_t* buffer,uint8_t size);
 void send_frame_complete();
-
-
 #endif /* FRAME_CODER_H_ */

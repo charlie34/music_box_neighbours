@@ -20,6 +20,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "frame_decoder.h"
+#include "frame_parser.h"
+#include "engine.h"
+#define frame_bufer 14
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -27,12 +30,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef struct temporizacion{
-	uint8_t hora;
-	uint8_t minuto;
-	uint8_t segundo;
-	uint8_t pista;
-}temporizacion;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -52,10 +50,15 @@ UART_HandleTypeDef huart2;
 //uint8_t c;
 /* USER CODE BEGIN PV */
 uint8_t buffer_uart[14];  //  creating a buffer of 10 bytes
-
-
-
-
+uint8_t frame_rx_completed_flag=0;
+/*
+typedef struct temporizacion{
+	uint8_t hora;
+	uint8_t minuto;
+	uint8_t segundo;
+	uint8_t pista;
+}temporizacion;
+*/
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,6 +69,7 @@ static void MX_USART1_UART_Init(void);
 static void MX_RTC_Init(void);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void USART2_IRQHandler(void);
+void SysTick_Handler(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -79,6 +83,7 @@ void USART2_IRQHandler(void);
   * @brief  The application entry point.
   * @retval int
   */
+temporizacion time_prog[20];
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -107,7 +112,11 @@ int main(void)
   MX_USART1_UART_Init();
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
-  temporizacion time_prog[5]={{23,50,00,1},{23,52,00,1},{23,53,00,1},{23,54,00,1},{23,55,00,1}};
+  uint8_t hora;
+	uint8_t minuto;
+	uint8_t segundo;
+	uint8_t track;
+  //temporizacion time_prog[5]={{23,50,00,1},{23,52,00,1},{23,53,00,1},{23,54,00,1},{23,55,00,1}};
   /* USER CODE END 2 */
  // HAL_UART_Receive_IT(&huart2, &c, 1);
   /* Infinite loop */
@@ -120,12 +129,12 @@ int main(void)
   RTC_DateTypeDef GetData;  //Get date structure
 
   RTC_TimeTypeDef GetTime;   //Get time structure
-  GetTime.Hours=24;
+  GetTime.Hours=21;
   GetTime.Minutes=50;
  //mp3_play_num(4);
  // mp3_play_physical_num(1);
   HAL_RTC_SetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
-  HAL_UART_Receive_IT(&huart2, buffer_uart, 13);
+  HAL_UART_Receive_IT(&huart2, buffer_uart, frame_bufer);
  // init(huart2);
   while (1)
   {
@@ -137,13 +146,20 @@ int main(void)
         		  mp3_play_physical_num(time_prog[i].pista);
         	  }
           }
-          put_hora(20);
-          put_minuto(30);
-          put_command(1);
-          put_data(2393);
-          send_frame_complete();
-	      /* Display date Format : yy/mm/dd */
-	     sprintf(buffer,"%02d/%02d/%02d\r\n",2000 + GetData.Year, GetData.Month, GetData.Date);
+         uint8_t hora=horas();
+         uint8_t minuto=minutos();
+         uint8_t segundo=segundos();
+         uint8_t track=tracks();
+          //send_frame_complete();
+          if(frame_rx_completed_flag){
+        	  uint8_t hora=horas();
+        	           uint8_t minuto=minutos();
+        	           uint8_t segundo=segundos();
+        	           uint8_t track=tracks();
+        	 command(huart2, cmd, time_prog, hora, minuto, segundo, track);
+          }
+          /* Display date Format : yy/mm/dd */
+	     //sprintf(buffer,"%02d/%02d/%02d\r\n",2000 + GetData.Year, GetData.Month, GetData.Date);
 	      /* Display time Format : hh:mm:ss */
 	     // HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
 	    //  sprintf(buffer,"%02d:%02d:%02d\r\n",GetTime.Hours, GetTime.Minutes, GetTime.Seconds);
@@ -162,6 +178,28 @@ int main(void)
   * @brief System Clock Configuration
   * @retval None
   */
+void SysTick_Handler(void)
+{
+  /* USER CODE BEGIN SysTick_IRQn 0 */
+   char buffer[20];
+   static int ticks=0;
+   RTC_TimeTypeDef GetTime;
+  /* USER CODE END SysTick_IRQn 0 */
+  HAL_IncTick();
+
+  if (ticks>=1000){
+	  exec(time_prog,hrtc);
+	  //HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+	   // sprintf(buffer,"%02d:%02d:%02d\r\n",GetTime.Hours, GetTime.Minutes, GetTime.Seconds);
+	  	   // HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
+
+	  ticks=0;
+  }
+ ticks++;
+  /* USER CODE BEGIN SysTick_IRQn 1 */
+
+  /* USER CODE END SysTick_IRQn 1 */
+}
 void USART2_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&huart2);
@@ -170,14 +208,29 @@ void USART2_IRQHandler(void)
 /* This callback is called by the HAL_UART_IRQHandler when the given number of bytes are received */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  if (huart->Instance == USART2)
+
+	uint8_t error=0;
+	uint8_t cmd_frame=0;
+  char buffer[14]={'H','E','L','L','O',0,0,0,0,0xFF,0,0,0xFF,0xEF};
+	if (huart->Instance == USART2)
   {
     /* Transmit one byte with 100 ms timeout */
     decoder(buffer_uart);
-	//HAL_UART_Transmit(&huart2, &c, 1, 100);
+    error=error_frame();
+    if (!error){
+    	frame_rx_completed_flag=1;
+    }else{
+    	frame_rx_completed_flag=0;
+
+    	HAL_UART_Transmit(&huart2, buffer, sizeof(buffer), 100);
+    }
+    cmd_frame=cmd_get();
+
+	//sprintf(buffer,"Error: %i",(int)error);
+
 
     /* Receive one byte in interrupt mode */
-    HAL_UART_Receive_IT(&huart2, buffer_uart, 13);
+   // HAL_UART_Receive_IT(&huart2, buffer_uart, frame_bufer);
   }
 }
 void SystemClock_Config(void)

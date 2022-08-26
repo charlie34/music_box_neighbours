@@ -4,23 +4,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Comunications/frame_coder.c \
-../Comunications/frame_decoder.c \
-../Comunications/frame_parser.c 
+../Engine/engine.c 
 
 OBJS += \
-./Comunications/frame_coder.o \
-./Comunications/frame_decoder.o \
-./Comunications/frame_parser.o 
+./Engine/engine.o 
 
 C_DEPS += \
-./Comunications/frame_coder.d \
-./Comunications/frame_decoder.d \
-./Comunications/frame_parser.d 
+./Engine/engine.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-Comunications/%.o: ../Comunications/%.c
+Engine/%.o: ../Engine/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU GCC Compiler'
 	@echo $(PWD)

@@ -11,15 +11,15 @@ void decoder(uint8_t *buffer_uart){
 	 static uint8_t data_byte_pos=0;
 
 	 // char buffer[20];
-	  char header[4]={'H','E','L','O'};
-	  for(int i=0;i<4;i++){
+	  char header[5]={'H','E','L','L','O'};
+	  for(int i=0;i<5;i++){
 		  if (header[i]==*(buffer_uart+i)){
 			  state_machine++;
 		  }
 	  }
-    if (state_machine==4){
-    	for (int j=4;j<13;j++){
-    		buffer_tmp[j-4]=*(buffer_uart+j);
+    if (state_machine==5){
+    	for (int j=5;j<14;j++){
+    		buffer_tmp[j-5]=*(buffer_uart+j);
     	}
     	state_machine=0;
     }
@@ -31,13 +31,14 @@ uint8_t checksum_calc(uint8_t *payload){
     	   tmp+=*(payload+i);
 
        }
-	tmp=-tmp;
+
 	return tmp;
 }
 uint8_t error_frame(){
-	uint8_t checksum_calc=checksum(buffer_tmp);
+	uint8_t checksum_real;
+	checksum_real=checksum_calc(buffer_tmp);
 	uint8_t error;
-	if (checksum_calc==checksum_tmp){
+	if (checksum_real==buffer_tmp[7]){
 		error=0;
 	}else{
 		error=-1;
@@ -45,17 +46,23 @@ uint8_t error_frame(){
 	return error;
 }
 uint8_t horas(){
-	return hora;
+	return buffer_tmp[0];
 }
 uint8_t minutos(){
-	return minuto;
+	return buffer_tmp[1];
 }
 uint8_t segundos(){
-	return segundo;
+	return buffer_tmp[2];
 }
 uint8_t tracks(){
-	return track;
+	return buffer_tmp[3];
+}
+uint8_t cmd_get(){
+	return buffer_tmp[4];
 }
 uint16_t datas(){
-	return data;
+	uint8_t data_tmp[2];
+	data_tmp[0]=buffer_tmp[5];
+	data_tmp[1]=buffer_tmp[6];
+	return (uint16_t)data_tmp;
 }

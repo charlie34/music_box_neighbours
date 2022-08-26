@@ -1,4 +1,4 @@
-Core/Src/main.o: ../Core/Src/main.c \
+Engine/engine.o: ../Engine/engine.c ../Engine/engine.h \
  C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Core/Inc/main.h \
  C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Core/Inc/stm32f4xx_hal_conf.h \
@@ -27,10 +27,9 @@ Core/Src/main.o: ../Core/Src/main.c \
  C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
  C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rtc.h \
  C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rtc_ex.h \
- C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Comunications/frame_decoder.h \
- C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Comunications/frame_parser.h \
- C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Engine/engine.h
+ C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
+
+../Engine/engine.h:
 
 C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Core/Inc/main.h:
 
@@ -89,9 +88,3 @@ C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Drivers/STM32F4xx_HAL_Driver/I
 C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rtc_ex.h:
 
 C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
-
-C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Comunications/frame_decoder.h:
-
-C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Comunications/frame_parser.h:
-
-C:/Users/Carlos/OneDrive/Documents/ej_UART_nucleo/Engine/engine.h:

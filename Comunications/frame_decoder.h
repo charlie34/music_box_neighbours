@@ -24,6 +24,7 @@ uint8_t minutos();
 uint8_t segundos();
 uint8_t tracks();
 uint16_t datas();
+uint8_t cmd_get();
 
 
 
