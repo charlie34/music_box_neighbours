@@ -18,6 +18,7 @@ typedef struct temporizacion{
 	uint8_t full;//flag que indica si es un registro lleno o no
 }temporizacion;
 temporizacion time_table[size_timetable];
+RTC_TimeTypeDef GetTime;
 void execute_cmd(uint8_t cmd);
 uint8_t scheduling_track(RTC_TimeTypeDef Time_current,RTC_DateTypeDef Date_current,temporizacion *time_prog,uint8_t size_prog);//Puntero de temporizacion hacia la lista de tiempos
 //Lo suyo es que RTC llame a su IT cada vez que haya un cambio y que asi se vaya actualizando

@@ -43,7 +43,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-RTC_HandleTypeDef hrtc;
+
 
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
@@ -83,7 +83,7 @@ void SysTick_Handler(void);
   * @brief  The application entry point.
   * @retval int
   */
-temporizacion time_prog[20];
+temporizacion time_prog[5];
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -128,7 +128,7 @@ int main(void)
 // initialization(huart1);
   RTC_DateTypeDef GetData;  //Get date structure
 
-  RTC_TimeTypeDef GetTime;   //Get time structure
+     //Get time structure
   GetTime.Hours=21;
   GetTime.Minutes=50;
  //mp3_play_num(4);
@@ -141,22 +141,21 @@ int main(void)
 	  HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);//Get time
 	      /* Get the RTC current Date */
 	      HAL_RTC_GetDate(&hrtc, &GetData, RTC_FORMAT_BIN);//get date
-          for (int i=0;i<5;i++){
+         /* for (int i=0;i<5;i++){
         	  if((time_prog[i].hora==GetTime.Hours) && (time_prog[i].minuto==GetTime.Minutes)&&(GetTime.Seconds==0)){
         		  mp3_play_physical_num(time_prog[i].pista);
         	  }
-          }
-         uint8_t hora=horas();
-         uint8_t minuto=minutos();
-         uint8_t segundo=segundos();
-         uint8_t track=tracks();
+          }*/
+
           //send_frame_complete();
           if(frame_rx_completed_flag){
         	  uint8_t hora=horas();
         	           uint8_t minuto=minutos();
         	           uint8_t segundo=segundos();
         	           uint8_t track=tracks();
+        	           uint8_t cmd=cmd_get();
         	 command(huart2, cmd, time_prog, hora, minuto, segundo, track);
+        	 frame_rx_completed_flag=0;
           }
           /* Display date Format : yy/mm/dd */
 	     //sprintf(buffer,"%02d/%02d/%02d\r\n",2000 + GetData.Year, GetData.Month, GetData.Date);
@@ -166,7 +165,7 @@ int main(void)
 	     // HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
 	      //printf("\r\n");
 
-	      HAL_Delay(1000);
+	     // HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -183,25 +182,29 @@ void SysTick_Handler(void)
   /* USER CODE BEGIN SysTick_IRQn 0 */
    char buffer[20];
    static int ticks=0;
-   RTC_TimeTypeDef GetTime;
+  RTC_TimeTypeDef GetTime;
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
-
-  if (ticks>=1000){
+  ticks++;
+ if (ticks>=1000){
+	 if(flag_scheduler){ //Flag para activar/desactivar temporizador
 	  exec(time_prog,hrtc);
-	  //HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
-	   // sprintf(buffer,"%02d:%02d:%02d\r\n",GetTime.Hours, GetTime.Minutes, GetTime.Seconds);
-	  	   // HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
+	 }
+	  HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+	   sprintf(buffer,"%02d:%02d:%02d\r\n",GetTime.Hours, GetTime.Minutes, GetTime.Seconds);
+	   HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
 
 	  ticks=0;
   }
- ticks++;
+}
+//
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
   /* USER CODE END SysTick_IRQn 1 */
-}
+//}
 void USART2_IRQHandler(void)
 {
+//	 HAL_UART_RxCpltCallback(&huart2);
   HAL_UART_IRQHandler(&huart2);
 }
 
@@ -211,18 +214,19 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 	uint8_t error=0;
 	uint8_t cmd_frame=0;
-  char buffer[14]={'H','E','L','L','O',0,0,0,0,0xFF,0,0,0xFF,0xEF};
+
 	if (huart->Instance == USART2)
   {
+		 char buffer[14]={'H','E','L','L','O',0,0,0,0,0xFF,0,0,0xFF,0xEF};
+
     /* Transmit one byte with 100 ms timeout */
-    decoder(buffer_uart);
-    error=error_frame();
-    if (!error){
+   decoder(buffer_uart);
+   error=error_frame();
+   if (!error){
     	frame_rx_completed_flag=1;
     }else{
     	frame_rx_completed_flag=0;
-
-    	HAL_UART_Transmit(&huart2, buffer, sizeof(buffer), 100);
+    	 HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), 100);
     }
     cmd_frame=cmd_get();
 
@@ -230,8 +234,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 
     /* Receive one byte in interrupt mode */
-   // HAL_UART_Receive_IT(&huart2, buffer_uart, frame_bufer);
+		 HAL_UART_Receive_IT(&huart2, buffer_uart, frame_bufer);
   }
+
 }
 void SystemClock_Config(void)
 {
@@ -393,7 +398,7 @@ static void MX_USART2_UART_Init(void)
   huart2.Init.Parity = UART_PARITY_NONE;
   huart2.Init.Mode = UART_MODE_TX_RX;
   huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  //huart2.Init.OverSampling = UART_OVERSAMPLING_16;
   if (HAL_UART_Init(&huart2) != HAL_OK)
   {
     Error_Handler();

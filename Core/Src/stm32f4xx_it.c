@@ -128,6 +128,7 @@ void BusFault_Handler(void)
 /**
   * @brief This function handles Undefined instruction or illegal state.
   */
+
 void UsageFault_Handler(void)
 {
   /* USER CODE BEGIN UsageFault_IRQn 0 */

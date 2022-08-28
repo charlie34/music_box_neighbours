@@ -39,10 +39,11 @@ extern "C" {
 /* USER CODE BEGIN ET */
 uint8_t c;
 /* USER CODE END ET */
-
+RTC_HandleTypeDef hrtc;
+RTC_TimeTypeDef GetTime;
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
+uint8_t flag_scheduler;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/

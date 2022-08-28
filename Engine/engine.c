@@ -41,7 +41,7 @@ void sheduling_table_init(temporizacion *time_prog,uint8_t size_prog){
 	}
 }
 void exec(temporizacion *time_prog,RTC_HandleTypeDef hrtc){
-	RTC_TimeTypeDef GetTime;
+
 	HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);//Get time
 		      /* Get the RTC current Date */
 		    //  HAL_RTC_GetDate(&hrtc, &GetData, RTC_FORMAT_BIN);//get date
