@@ -192,7 +192,7 @@ void SysTick_Handler(void)
 	 }
 	  HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
 	   sprintf(buffer,"%02d:%02d:%02d\r\n",GetTime.Hours, GetTime.Minutes, GetTime.Seconds);
-	   HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
+	 //  HAL_UART_Transmit(&huart2, (uint8_t*)buffer, sizeof(buffer), HAL_MAX_DELAY);
 
 	  ticks=0;
   }

@@ -37,5 +37,18 @@ void command(UART_HandleTypeDef huart,uint8_t cmd,temporizacion *time_temp,uint8
   	  	  		  		HAL_UART_Transmit(&huart, buffer, sizeof(buffer), 100);
   	  	  		  		break;
   	  	  	}
+  	case 0x05:{
+
+
+  	  		HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
+
+  	  	  	  		 char buffer[14]={'H','E','L','L','O',0,0,0,0,0x05,0,0,0x00,0xEF};
+  	  	  	  		 buffer[5]=GetTime.Hours;
+  	  	  	        	buffer[6]=GetTime.Minutes;
+  	  	            	buffer[7]=GetTime.Seconds;
+  	  	            	buffer[12]=checksum_calc(buffer);
+  	  	  	  		  		HAL_UART_Transmit(&huart, buffer, sizeof(buffer), 100);
+  	  	  	  		  		break;
+  	  	  	  	}
   	}
 }
